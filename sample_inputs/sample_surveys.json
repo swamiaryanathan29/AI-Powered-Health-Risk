@@ -1,0 +1,37 @@
+{
+  "complete_json_survey": {
+    "age": 42,
+    "smoker": true,
+    "exercise": "rarely",
+    "diet": "high sugar"
+  },
+  "complete_text_survey": "Age: 42\nSmoker: yes\nExercise: rarely\nDiet: high sugar",
+  "incomplete_survey_guardrail": {
+    "age": 42
+  },
+  "low_risk_survey": {
+    "age": 28,
+    "smoker": false,
+    "exercise": "daily",
+    "diet": "balanced"
+  },
+  "moderate_risk_survey": {
+    "age": 40,
+    "smoker": false,
+    "exercise": "moderate",
+    "diet": "high sugar",
+    "bmi": 27
+  },
+  "high_risk_extended": {
+    "age": 55,
+    "smoker": true,
+    "exercise": "never",
+    "diet": "junk food",
+    "alcohol": true,
+    "bmi": 32,
+    "stress": "high",
+    "sleep_hours": 5,
+    "blood_pressure": "high",
+    "family_history": true
+  }
+}
