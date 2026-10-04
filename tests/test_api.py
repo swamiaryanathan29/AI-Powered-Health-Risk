@@ -201,3 +201,15 @@ def test_full_pipeline_text_raw():
     assert r.status_code == 200
     data = r.json()
     assert data["risk"]["risk_level"] in ("low", "moderate", "high")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Plum Insurance UI Portal
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_plum_portal():
+    r = client.get("/plum")
+    assert r.status_code == 200
+    assert "Plum Health Insurance" in r.text
+    assert "Underwriting AI" in r.text
+

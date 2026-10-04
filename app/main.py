@@ -70,12 +70,34 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+import os
+
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(parse_router.router)
 app.include_router(factor_router.router)
 app.include_router(risk_router.router)
 app.include_router(recommendation_router.router)
 app.include_router(pipeline_router.router)
+
+# Mount sample_inputs static directory if it exists
+sample_dir = os.path.join(os.path.dirname(__file__), "..", "sample_inputs")
+if os.path.exists(sample_dir):
+    app.mount("/sample_inputs", StaticFiles(directory=sample_dir), name="sample_inputs")
+
+
+# ── Plum Insurance Portal UI ──────────────────────────────────────────────────
+PLUM_UI_PATH = os.path.join(os.path.dirname(__file__), "..", "plum_insurance_portal.html")
+
+@app.get("/plum", response_class=HTMLResponse, tags=["Plum Insurance UI"], summary="Plum Health Insurance Underwriting Portal")
+@app.get("/ui", response_class=HTMLResponse, tags=["Plum Insurance UI"], summary="Plum Health Insurance Underwriting Portal")
+async def plum_portal():
+    """Serves the Plum Health Insurance Underwriting & Risk Profiler UI."""
+    if os.path.exists(PLUM_UI_PATH):
+        with open(PLUM_UI_PATH, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(content="<h1>Plum Portal File Not Found</h1>", status_code=404)
 
 
 # ── Root health check ─────────────────────────────────────────────────────────
@@ -86,6 +108,7 @@ async def root():
         "status": "ok",
         "version": "1.0.0",
         "docs": "/docs",
+        "plum_ui": "/plum",
     }
 
 
@@ -97,3 +120,4 @@ async def health():
 # ── Entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+

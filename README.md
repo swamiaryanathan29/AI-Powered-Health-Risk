@@ -83,7 +83,8 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 API is now live at **http://localhost:8000**  
-Swagger UI: **http://localhost:8000/docs**
+Swagger UI: **http://localhost:8000/docs**  
+🟣 **Plum Health Insurance Portal UI**: **http://localhost:8000/plum** (or `/ui`)
 
 ---
 
@@ -123,8 +124,9 @@ Expected output: **17 tests passed**.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/` | Service info |
+| GET | `/` | Service info & links |
 | GET | `/health` | Health check |
+| GET | `/plum` (or `/ui`) | 🟣 Plum Health Insurance Underwriting Portal (Web UI) |
 | POST | `/api/v1/parse/text` | Step 1 – Parse text/JSON survey |
 | POST | `/api/v1/parse/image` | Step 1 – Parse scanned image (OCR) |
 | POST | `/api/v1/factors` | Step 2 – Extract risk factors |
@@ -132,6 +134,7 @@ Expected output: **17 tests passed**.
 | POST | `/api/v1/recommendations` | Step 4 – Generate recommendations |
 | POST | `/api/v1/analyze/text` | 🔀 Full pipeline (text/JSON) |
 | POST | `/api/v1/analyze/image` | 🔀 Full pipeline (image) |
+
 
 ---
 

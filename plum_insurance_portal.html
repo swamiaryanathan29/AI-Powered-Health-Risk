@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plum Health Insurance — AI Risk Profiler & Underwriting Portal</title>
+  <meta name="description" content="AI-Powered Underwriting and Health Risk Intelligence for Plum Health Insurance. Instant risk tiering, clinical factor extraction, and preventive recommendations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --plum-950: #090514;
+      --plum-900: #120b29;
+      --plum-850: #191038;
+      --plum-800: #22164d;
+      --plum-700: #332070;
+      --plum-600: #4e2ea6;
+      --plum-500: #6835f9;
+      --plum-400: #844aff;
+      --plum-300: #a78bfa;
+      --plum-200: #c4b5fd;
+      --plum-100: #ede9fe;
+      --plum-50:  #f5f3ff;
+
+      --slate-50: #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+
+      --emerald-500: #10b981;
+      --emerald-400: #34d399;
+      --emerald-bg: rgba(16, 185, 129, 0.12);
+      --emerald-border: rgba(16, 185, 129, 0.35);
+
+      --amber-500: #f59e0b;
+      --amber-400: #fbbf24;
+      --amber-bg: rgba(245, 158, 11, 0.12);
+      --amber-border: rgba(245, 158, 11, 0.35);
+
+      --rose-500: #f43f5e;
+      --rose-400: #fb7185;
+      --rose-bg: rgba(244, 63, 94, 0.12);
+      --rose-border: rgba(244, 63, 94, 0.35);
+
+      --card-bg: rgba(25, 16, 56, 0.72);
+      --card-border: rgba(132, 74, 255, 0.2);
+      --card-hover-border: rgba(132, 74, 255, 0.45);
+      --card-glow: 0 8px 32px 0 rgba(104, 53, 249, 0.15);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 15% 10%, #1e1145 0%, #0c071d 45%, #070412 100%);
+      color: var(--slate-100);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      padding-bottom: 60px;
+    }
+
+    /* Ambient background glows */
+    .ambient-glow-1 {
+      position: fixed;
+      top: -100px;
+      left: 10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(104, 53, 249, 0.18) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(50px);
+    }
+    .ambient-glow-2 {
+      position: fixed;
+      bottom: 50px;
+      right: 5%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(132, 74, 255, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(60px);
+    }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(14, 9, 32, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(132, 74, 255, 0.18);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #844aff 0%, #6835f9 60%, #431cd6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px rgba(104, 53, 249, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-title span.accent {
+      background: linear-gradient(135deg, #c4b5fd 0%, #844aff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      background: rgba(104, 53, 249, 0.25);
+      border: 1px solid rgba(132, 74, 255, 0.4);
+      color: var(--plum-200);
+      margin-left: 4px;
+    }
+
+    .brand-sub {
+      font-size: 0.76rem;
+      color: var(--slate-400);
+      font-weight: 500;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .api-status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--emerald-400);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald-400);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald-400);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .nav-btn {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--plum-200);
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(132, 74, 255, 0.2);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover {
+      background: rgba(104, 53, 249, 0.2);
+      border-color: rgba(132, 74, 255, 0.5);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 24px 20px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Hero header */
+    .hero-header {
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(132, 74, 255, 0.15);
+    }
+
+    .hero-left h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: #ffffff;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-left p {
+      font-size: 0.95rem;
+      color: var(--slate-300);
+      max-width: 680px;
+    }
+
+    .hero-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag-chip {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--plum-200);
+      background: rgba(104, 53, 249, 0.16);
+      border: 1px solid rgba(132, 74, 255, 0.25);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Quick Preset Persona Bar */
+    .presets-card {
+      background: linear-gradient(180deg, rgba(34, 22, 77, 0.75) 0%, rgba(20, 13, 48, 0.75) 100%);
+      border: 1px solid rgba(132, 74, 255, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      box-shadow: var(--card-glow);
+    }
+
+    .presets-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--plum-200);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .preset-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .preset-btn {
+      background: rgba(14, 9, 32, 0.6);
+      border: 1px solid rgba(132, 74, 255, 0.2);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      color: var(--slate-200);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.22s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preset-btn:hover {
+      background: rgba(104, 53, 249, 0.22);
+      border-color: rgba(132, 74, 255, 0.55);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(104, 53, 249, 0.2);
+    }
+
+    .preset-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+
+    .preset-btn.low .preset-icon {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid var(--emerald-border);
+      color: var(--emerald-400);
+    }
+    .preset-btn.mod .preset-icon {
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid var(--amber-border);
+      color: var(--amber-400);
+    }
+    .preset-btn.high .preset-icon {
+      background: rgba(244, 63, 94, 0.18);
+      border: 1px solid var(--rose-border);
+      color: var(--rose-400);
+    }
+    .preset-btn.guardrail .preset-icon {
+      background: rgba(148, 163, 184, 0.18);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: var(--slate-300);
+    }
+
+    .preset-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: block;
+    }
+
+    .preset-desc {
+      font-size: 0.72rem;
+      color: var(--slate-400);
+      display: block;
+    }
+
+    /* Grid Layout */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 28px;
+    }
+
+    @media (max-width: 1040px) {
+      .portal-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Panel Card */
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      backdrop-filter: blur(14px);
+      box-shadow: var(--card-glow);
+      position: relative;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(132, 74, 255, 0.15);
+    }
+
+    .panel-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: rgba(104, 53, 249, 0.25);
+      color: var(--plum-200);
+      border: 1px solid rgba(132, 74, 255, 0.3);
+    }
+
+    /* Tab Switcher */
+    .tabs-wrap {
+      display: flex;
+      background: rgba(14, 9, 32, 0.7);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(132, 74, 255, 0.2);
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      color: var(--slate-400);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .tab-btn.active {
+      background: var(--plum-500);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(104, 53, 249, 0.4);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--slate-200);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--slate-200);
+      margin-bottom: 8px;
+    }
+
+    .form-label span.req {
+      color: var(--rose-400);
+      margin-left: 4px;
+    }
+
+    .form-label span.val-display {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--plum-300);
+      font-weight: 600;
+    }
+
+    /* Inputs */
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .text-input, .select-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(14, 9, 32, 0.7);
+      border: 1px solid rgba(132, 74, 255, 0.25);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .text-input:focus, .select-input:focus {
+      border-color: var(--plum-400);
+      box-shadow: 0 0 0 3px rgba(104, 53, 249, 0.25);
+    }
+
+    /* Range Slider */
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .range-slider {
+      flex: 1;
+      accent-color: var(--plum-500);
+      height: 6px;
+      border-radius: var(--radius-full);
+      background: rgba(132, 74, 255, 0.25);
+      cursor: pointer;
+    }
+
+    /* Segmented pill group */
+    .pill-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 8px;
+    }
+
+    .pill-radio {
+      position: relative;
+    }
+
+    .pill-radio input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .pill-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(14, 9, 32, 0.6);
+      border: 1px solid rgba(132, 74, 255, 0.2);
+      color: var(--slate-300);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .pill-radio input:checked + .pill-label {
+      background: linear-gradient(135deg, rgba(104, 53, 249, 0.35) 0%, rgba(132, 74, 255, 0.25) 100%);
+      border-color: var(--plum-400);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(104, 53, 249, 0.3);
+    }
+
+    .pill-label:hover {
+      border-color: rgba(132, 74, 255, 0.4);
+      color: #ffffff;
+    }
+
+    /* Textarea */
+    .code-textarea {
+      width: 100%;
+      min-height: 220px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: rgba(12, 7, 28, 0.85);
+      border: 1px solid rgba(132, 74, 255, 0.25);
+      color: #a78bfa;
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      line-height: 1.6;
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+
+    .code-textarea:focus {
+      border-color: var(--plum-400);
+      box-shadow: 0 0 0 3px rgba(104, 53, 249, 0.25);
+    }
+
+    /* OCR Drag & Drop Zone */
+    .drop-zone {
+      border: 2px dashed rgba(132, 74, 255, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 32px 20px;
+      text-align: center;
+      background: rgba(14, 9, 32, 0.4);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--plum-400);
+      background: rgba(104, 53, 249, 0.12);
+      transform: scale(1.01);
+    }
+
+    .drop-icon {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      color: var(--plum-300);
+    }
+
+    .drop-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .drop-sub {
+      font-size: 0.78rem;
+      color: var(--slate-400);
+      margin-bottom: 14px;
+    }
+
+    .file-preview {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(104, 53, 249, 0.15);
+      border: 1px solid rgba(132, 74, 255, 0.3);
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--plum-200);
+    }
+
+    /* Action Buttons */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .primary-btn {
+      flex: 1;
+      padding: 13px 20px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: linear-gradient(135deg, #844aff 0%, #6835f9 60%, #5022dc 100%);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(104, 53, 249, 0.45);
+      transition: all 0.2s ease;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 26px rgba(104, 53, 249, 0.6);
+      filter: brightness(1.1);
+    }
+
+    .primary-btn:active {
+      transform: translateY(0);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secondary-btn {
+      padding: 13px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(132, 74, 255, 0.3);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--slate-300);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .secondary-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+
+    /* Output Panel */
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--slate-400);
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+
+    .empty-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .empty-sub {
+      font-size: 0.85rem;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    /* Result Content */
+    .result-container {
+      display: none;
+      animation: fadeIn 0.35s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Underwriting Verdict Box */
+    .verdict-banner {
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .verdict-banner.low {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(6, 95, 70, 0.25) 100%);
+      border: 1px solid var(--emerald-border);
+    }
+    .verdict-banner.moderate {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(146, 64, 14, 0.25) 100%);
+      border: 1px solid var(--amber-border);
+    }
+    .verdict-banner.high {
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.18) 0%, rgba(159, 18, 57, 0.28) 100%);
+      border: 1px solid var(--rose-border);
+    }
+
+    .verdict-info {
+      flex: 1;
+    }
+
+    .verdict-subtitle {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .verdict-banner.low .verdict-subtitle { color: var(--emerald-400); }
+    .verdict-banner.moderate .verdict-subtitle { color: var(--amber-400); }
+    .verdict-banner.high .verdict-subtitle { color: var(--rose-400); }
+
+    .verdict-headline {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .verdict-description {
+      font-size: 0.82rem;
+      color: var(--slate-300);
+      line-height: 1.45;
+    }
+
+    /* Gauge / Score Meter */
+    .gauge-card {
+      background: rgba(14, 9, 32, 0.65);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      text-align: center;
+      min-width: 110px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .gauge-score {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .verdict-banner.low .gauge-score { color: var(--emerald-400); }
+    .verdict-banner.moderate .gauge-score { color: var(--amber-400); }
+    .verdict-banner.high .gauge-score { color: var(--rose-400); }
+
+    .gauge-max {
+      font-size: 0.68rem;
+      color: var(--slate-400);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    /* Metrics Grid */
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .metric-box {
+      background: rgba(14, 9, 32, 0.55);
+      border: 1px solid rgba(132, 74, 255, 0.18);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+
+    .metric-label {
+      font-size: 0.72rem;
+      color: var(--slate-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .metric-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Factors & Rationale */
+    .section-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .factors-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .factor-tag {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: #fecdd3;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .factor-tag.clean {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #a7f3d0;
+    }
+
+    .rationale-list {
+      list-style: none;
+      margin-bottom: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .rationale-item {
+      font-size: 0.83rem;
+      color: var(--slate-200);
+      background: rgba(14, 9, 32, 0.45);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--plum-400);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .rationale-bullet {
+      font-weight: 800;
+      color: var(--plum-300);
+    }
+
+    /* Recommendations / Preventive Care */
+    .recs-box {
+      background: linear-gradient(180deg, rgba(34, 22, 77, 0.5) 0%, rgba(19, 11, 46, 0.5) 100%);
+      border: 1px solid rgba(132, 74, 255, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-bottom: 22px;
+    }
+
+    .rec-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(132, 74, 255, 0.12);
+    }
+
+    .rec-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .rec-icon-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(104, 53, 249, 0.25);
+      border: 1px solid rgba(132, 74, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--plum-200);
+      font-size: 0.72rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .rec-text {
+      font-size: 0.84rem;
+      color: var(--slate-200);
+      line-height: 1.45;
+    }
+
+    /* Underwriting Plum Benefit Box */
+    .plum-benefit-card {
+      background: linear-gradient(135deg, rgba(104, 53, 249, 0.22) 0%, rgba(67, 28, 214, 0.3) 100%);
+      border: 1px solid rgba(132, 74, 255, 0.4);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-bottom: 20px;
+    }
+
+    .plum-benefit-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--plum-200);
+      margin-bottom: 8px;
+    }
+
+    .plum-benefit-content {
+      font-size: 0.84rem;
+      color: #ffffff;
+      line-height: 1.5;
+    }
+
+    /* Bottom Action Toolbar */
+    .report-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .action-btn.primary {
+      background: rgba(104, 53, 249, 0.3);
+      border: 1px solid rgba(132, 74, 255, 0.5);
+      color: #ffffff;
+    }
+
+    .action-btn.primary:hover {
+      background: var(--plum-500);
+    }
+
+    .action-btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--slate-300);
+    }
+
+    .action-btn.ghost:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+    }
+
+    /* Raw JSON Drawer */
+    .raw-json-drawer {
+      margin-top: 20px;
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .raw-json-pre {
+      background: #090514;
+      border: 1px solid rgba(132, 74, 255, 0.25);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: #a78bfa;
+      max-height: 260px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      background: #1e1145;
+      border: 1px solid var(--plum-400);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.error {
+      background: #2b0e1b;
+      border-color: var(--rose-400);
+      color: #ffe4e6;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .navbar, .presets-card, .btn-row, .report-actions, .tabs-wrap, .panel-card:first-child, .ambient-glow-1, .ambient-glow-2 {
+        display: none !important;
+      }
+      .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+      .portal-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .panel-card {
+        border: 1px solid #ccc !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: none !important;
+      }
+      .verdict-headline, .panel-title, .section-title, .metric-val, .rec-text, .rationale-item {
+        color: #000000 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glows -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="#" class="brand-wrap">
+      <div class="brand-logo-icon">
+        <!-- Plum Plum Icon / Cross Heart SVG -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          <path d="M12 9v6"/>
+          <path d="M9 12h6"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">plum <span class="accent">health</span> <span class="brand-badge">Underwriting AI</span></div>
+        <div class="brand-sub">Comprehensive Group & Individual Health Risk Intelligence</div>
+      </div>
+    </a>
+
+    <div class="nav-actions">
+      <div class="api-status-pill" id="api-status-pill">
+        <span class="status-dot"></span>
+        <span id="api-status-text">API Online (8000)</span>
+      </div>
+      <a href="/docs" target="_blank" class="nav-btn" title="Open Swagger Documentation">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Swagger Docs
+      </a>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <main class="container">
+    
+    <!-- Hero Header -->
+    <section class="hero-header">
+      <div class="hero-left">
+        <h1>
+          <span>Health Risk Profiler & Underwriter</span>
+        </h1>
+        <p>
+          Automated clinical factor extraction, risk tier scoring, and preventive health recommendations for policyholders and corporate wellness programs.
+        </p>
+      </div>
+      <div class="hero-tags">
+        <span class="tag-chip">⚡ 4-Stage Pipeline</span>
+        <span class="tag-chip">🔍 OCR & Text Parsing</span>
+        <span class="tag-chip">🛡️ Data Guardrails</span>
+        <span class="tag-chip">🏥 Plum Telehealth</span>
+      </div>
+    </section>
+
+    <!-- Quick Preset Personas -->
+    <section class="presets-card">
+      <div class="presets-title">
+        <span>⚡ Quick Underwriting Personas (1-Click Test Scenarios)</span>
+        <span style="font-size:0.72rem; color:var(--slate-400); text-transform:none;">Click to populate assessment</span>
+      </div>
+      <div class="preset-buttons">
+        <!-- Low Risk -->
+        <button class="preset-btn low" onclick="applyPreset('low')" id="preset-low">
+          <div class="preset-icon">🌱</div>
+          <div>
+            <span class="preset-name">Young Tech Worker</span>
+            <span class="preset-desc">Age 28 • Non-smoker • Daily gym • Low Risk</span>
+          </div>
+        </button>
+
+        <!-- Moderate Risk -->
+        <button class="preset-btn mod" onclick="applyPreset('moderate')" id="preset-mod">
+          <div class="preset-icon">⚖️</div>
+          <div>
+            <span class="preset-name">Mid-Level Manager</span>
+            <span class="preset-desc">Age 40 • Moderate activity • High sugar • Mod Risk</span>
+          </div>
+        </button>
+
+        <!-- High Risk -->
+        <button class="preset-btn high" onclick="applyPreset('high')" id="preset-high">
+          <div class="preset-icon">⚠️</div>
+          <div>
+            <span class="preset-name">Senior Executive</span>
+            <span class="preset-desc">Age 55 • Smoker • Sedentary • High Stress</span>
+          </div>
+        </button>
+
+        <!-- Guardrail Failure -->
+        <button class="preset-btn guardrail" onclick="applyPreset('incomplete')" id="preset-guardrail">
+          <div class="preset-icon">🛡️</div>
+          <div>
+            <span class="preset-name">Incomplete Form</span>
+            <span class="preset-desc">Only Age 42 • Triggers 422 Guardrail</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Portal Grid -->
+    <div class="portal-grid">
+
+      <!-- LEFT: Input Panel -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <span>Health Risk Intake</span>
+            <span class="panel-title-badge">Step 1-4 Input</span>
+          </h2>
+          <span style="font-size:0.75rem; color:var(--plum-300);">Auto-validated</span>
+        </div>
+
+        <!-- Mode Tabs -->
+        <div class="tabs-wrap">
+          <button class="tab-btn active" id="tab-form" onclick="switchTab('form')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Interactive Form
+          </button>
+          <button class="tab-btn" id="tab-text" onclick="switchTab('text')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Raw Survey / JSON
+          </button>
+          <button class="tab-btn" id="tab-ocr" onclick="switchTab('ocr')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Scanned OCR Upload
+          </button>
+        </div>
+
+        <!-- TAB 1: FORM -->
+        <form id="health-form" onsubmit="event.preventDefault(); runAnalysis();">
+          
+          <!-- Age & Gender -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Applicant Age <span class="req">*</span></span>
+              <span class="val-display" id="age-display">35 years</span>
+            </div>
+            <div class="range-wrap">
+              <input type="range" class="range-slider" id="input-age" min="18" max="85" value="35" oninput="document.getElementById('age-display').innerText = this.value + ' years'">
+            </div>
+          </div>
+
+          <!-- Smoker Status -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Tobacco / Smoking Status <span class="req">*</span></span>
+            </div>
+            <div class="pill-group">
+              <label class="pill-radio">
+                <input type="radio" name="smoker" value="false" checked id="smoker-no">
+                <span class="pill-label">🚭 Non-Smoker</span>
+              </label>
+              <label class="pill-radio">
+                <input type="radio" name="smoker" value="true" id="smoker-yes">
+                <span class="pill-label">🚬 Active Smoker</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Physical Activity / Exercise -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Physical Activity & Exercise <span class="req">*</span></span>
+            </div>
+            <div class="pill-group">
+              <label class="pill-radio">
+                <input type="radio" name="exercise" value="daily" checked id="ex-daily">
+                <span class="pill-label">🏃 Daily / Active</span>
+              </label>
+              <label class="pill-radio">
+                <input type="radio" name="exercise" value="moderate" id="ex-mod">
+                <span class="pill-label">🚶 3-4x / Week</span>
+              </label>
+              <label class="pill-radio">
+                <input type="radio" name="exercise" value="rarely" id="ex-rare">
+                <span class="pill-label">🛋️ Rarely / Light</span>
+              </label>
+              <label class="pill-radio">
+                <input type="radio" name="exercise" value="never" id="ex-never">
+                <span class="pill-label">🛑 Sedentary / Never</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Dietary Habits -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Dietary Profile <span class="req">*</span></span>
+            </div>
+            <div class="pill-group">
+              <label class="pill-radio">
+                <input type="radio" name="diet" value="balanced" checked id="diet-balanced">
+                <span class="pill-label">🥗 Balanced / Fresh</span>
+              </label>
+              <label class="pill-radio">
+                <input type="radio" name="diet" value="average" id="diet-avg">
+                <span class="pill-label">🍲 Average Diet</span>
+              </label>
+              <label class="pill-radio">
+                <input type="radio" name="diet" value="high sugar" id="diet-sugar">
+                <span class="pill-label">🍩 High Sugar</span>
+              </label>
+              <label class="pill-radio">
+                <input type="radio" name="diet" value="junk food" id="diet-junk">
+                <span class="pill-label">🍔 Fast / Junk Food</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Extended Vitals (Optional) -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Supplemental Vitals (Optional Underwriting Flags)</span>
+            </div>
+            <div class="input-row">
+              <div>
+                <select class="select-input" id="input-bp">
+                  <option value="">Blood Pressure: Normal</option>
+                  <option value="high">Blood Pressure: Elevated / High</option>
+                </select>
+              </div>
+              <div>
+                <select class="select-input" id="input-stress">
+                  <option value="low">Stress: Low / Manageable</option>
+                  <option value="moderate">Stress: Moderate</option>
+                  <option value="high">Stress: High / Chronic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="form-group">
+              <div class="form-label"><span>BMI Estimate</span></div>
+              <input type="number" class="text-input" id="input-bmi" placeholder="e.g. 24" min="15" max="50">
+            </div>
+            <div class="form-group">
+              <div class="form-label"><span>Sleep (Hours/night)</span></div>
+              <input type="number" class="text-input" id="input-sleep" placeholder="e.g. 7" min="3" max="12">
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="btn-row">
+            <button type="submit" class="primary-btn" id="btn-submit">
+              <span class="spinner" id="btn-spinner"></span>
+              <span id="btn-text">Generate Plum Risk Profile</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+            <button type="button" class="secondary-btn" onclick="resetForm()">Reset</button>
+          </div>
+        </form>
+
+        <!-- TAB 2: RAW TEXT / JSON -->
+        <div id="text-tab-content" style="display:none;">
+          <div class="form-group">
+            <div class="form-label">
+              <span>Paste Key-Value Survey or JSON Object</span>
+              <span style="font-size:0.75rem; color:var(--plum-300);">Accepted by /api/v1/analyze/text</span>
+            </div>
+            <textarea class="code-textarea" id="raw-text-input">{
+  "age": 42,
+  "smoker": true,
+  "exercise": "rarely",
+  "diet": "high sugar",
+  "blood_pressure": "high"
+}</textarea>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="primary-btn" onclick="submitRawText()">
+              <span class="spinner" id="btn-text-spinner"></span>
+              <span>Analyze Survey Payload</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB 3: OCR SCANNED UPLOAD -->
+        <div id="ocr-tab-content" style="display:none;">
+          <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+            <div class="drop-icon">📑</div>
+            <div class="drop-title">Upload Scanned Health Declaration</div>
+            <div class="drop-sub">Drag & drop PNG, JPG or click to browse. Automatically extracts text using OCR.</div>
+            <input type="file" id="file-input" style="display:none;" accept="image/*" onchange="handleFileSelect(event)">
+            <button type="button" class="action-btn ghost" style="margin:0 auto;" onclick="event.stopPropagation(); loadSampleImage();">
+              Load Sample Scanned Survey Form
+            </button>
+          </div>
+          <div class="file-preview" id="file-preview">
+            <span id="file-name-display">sample_survey.png</span>
+            <span style="color:var(--emerald-400); font-weight:700;">Ready for OCR</span>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="primary-btn" id="btn-ocr" onclick="submitOcrImage()">
+              <span class="spinner" id="btn-ocr-spinner"></span>
+              <span>Run Optical Character Extraction & Profiling</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT: Results & Underwriting Intelligence -->
+      <section class="panel-card" id="results-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <span>Underwriting Verdict & Report</span>
+          </h2>
+          <span style="font-size:0.75rem; color:var(--slate-400);" id="process-time-label">Ready</span>
+        </div>
+
+        <!-- Initial Empty State -->
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">🛡️</div>
+          <div class="empty-title">Awaiting Assessment Submission</div>
+          <div class="empty-sub">
+            Select a quick persona above or fill out the applicant questionnaire to generate an instant actuarial risk profile.
+          </div>
+        </div>
+
+        <!-- Result Container -->
+        <div class="result-container" id="result-container">
+          
+          <!-- Verdict Banner -->
+          <div class="verdict-banner" id="verdict-banner">
+            <div class="verdict-info">
+              <div class="verdict-subtitle" id="verdict-subtitle">Underwriting Classification</div>
+              <div class="verdict-headline" id="verdict-headline">Low Health Risk</div>
+              <div class="verdict-description" id="verdict-description">
+                Standard terms approved. Applicant exhibits favorable cardiovascular and lifestyle parameters.
+              </div>
+            </div>
+            <div class="gauge-card">
+              <div class="gauge-score" id="risk-score">0</div>
+              <div class="gauge-max">Score (0-100)</div>
+            </div>
+          </div>
+
+          <!-- Key Metrics -->
+          <div class="metrics-bar">
+            <div class="metric-box">
+              <div class="metric-label">Risk Category</div>
+              <div class="metric-val" id="metric-risk-level">LOW</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Parser Confidence</div>
+              <div class="metric-val" id="metric-confidence">92%</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Active Factors</div>
+              <div class="metric-val" id="metric-factor-count">0 Detected</div>
+            </div>
+          </div>
+
+          <!-- Plum InsurTech Policy Benefit & Underwriting Recommendation -->
+          <div class="plum-benefit-card" id="plum-benefit-card">
+            <div class="plum-benefit-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              Plum Underwriting & Benefit Tier
+            </div>
+            <div class="plum-benefit-content" id="plum-benefit-content">
+              Eligible for <strong>15% Plum Healthy Habits Wellness Discount</strong>. Automatic enrollment into Plum Comprehensive Teleconsultations and Annual Preventive Health Checkup.
+            </div>
+          </div>
+
+          <!-- Identified Risk Factors -->
+          <div class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            Identified Clinical & Lifestyle Factors
+          </div>
+          <div class="factors-wrap" id="factors-wrap">
+            <!-- Injected by JS -->
+          </div>
+
+          <!-- Rationale / Actuarial Notes -->
+          <div class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Actuarial Rationale & Clinical Findings
+          </div>
+          <ul class="rationale-list" id="rationale-list">
+            <!-- Injected by JS -->
+          </ul>
+
+          <!-- Preventive Action Plan & Recommendations -->
+          <div class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Preventive Healthcare & Care Pathway
+          </div>
+          <div class="recs-box" id="recs-box">
+            <!-- Injected by JS -->
+          </div>
+
+          <!-- Action Toolbar -->
+          <div class="report-actions">
+            <button class="action-btn primary" onclick="window.print()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Print / Export Plum Report
+            </button>
+            <button class="action-btn ghost" onclick="copySummaryText()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              Copy Summary
+            </button>
+            <button class="action-btn ghost" onclick="toggleJsonDrawer()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              Raw API Payload
+            </button>
+          </div>
+
+          <!-- Raw JSON Drawer -->
+          <div class="raw-json-drawer" id="raw-json-drawer">
+            <div style="font-size:0.75rem; color:var(--slate-400); margin-bottom:6px; font-weight:600;">FastAPI Response Payload:</div>
+            <pre class="raw-json-pre" id="raw-json-code"></pre>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Notification</div>
+
+  <script>
+    const API_BASE = "http://localhost:8000";
+    let lastResponseData = null;
+    let selectedFile = null;
+
+    // Check API Health on load
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch(`${API_BASE}/health`);
+        if (res.ok) {
+          document.getElementById('api-status-pill').style.display = 'flex';
+          document.getElementById('api-status-text').innerText = 'API Connected (Port 8000)';
+        }
+      } catch (err) {
+        document.getElementById('api-status-text').innerText = 'Backend Offline';
+        document.getElementById('api-status-pill').style.color = '#fb7185';
+      }
+    });
+
+    // Tab Switching
+    function switchTab(mode) {
+      document.getElementById('tab-form').classList.remove('active');
+      document.getElementById('tab-text').classList.remove('active');
+      document.getElementById('tab-ocr').classList.remove('active');
+
+      document.getElementById('health-form').style.display = 'none';
+      document.getElementById('text-tab-content').style.display = 'none';
+      document.getElementById('ocr-tab-content').style.display = 'none';
+
+      if (mode === 'form') {
+        document.getElementById('tab-form').classList.add('active');
+        document.getElementById('health-form').style.display = 'block';
+      } else if (mode === 'text') {
+        document.getElementById('tab-text').classList.add('active');
+        document.getElementById('text-tab-content').style.display = 'block';
+      } else if (mode === 'ocr') {
+        document.getElementById('tab-ocr').classList.add('active');
+        document.getElementById('ocr-tab-content').style.display = 'block';
+      }
+    }
+
+    // Quick Presets
+    function applyPreset(type) {
+      switchTab('form');
+      if (type === 'low') {
+        document.getElementById('input-age').value = 28;
+        document.getElementById('age-display').innerText = '28 years';
+        document.getElementById('smoker-no').checked = true;
+        document.getElementById('ex-daily').checked = true;
+        document.getElementById('diet-balanced').checked = true;
+        document.getElementById('input-bp').value = '';
+        document.getElementById('input-stress').value = 'low';
+        document.getElementById('input-bmi').value = '22';
+        document.getElementById('input-sleep').value = '8';
+        showToast('Applied Persona: Young Tech Worker (Low Risk)');
+        runAnalysis();
+      } else if (type === 'moderate') {
+        document.getElementById('input-age').value = 40;
+        document.getElementById('age-display').innerText = '40 years';
+        document.getElementById('smoker-no').checked = true;
+        document.getElementById('ex-mod').checked = true;
+        document.getElementById('diet-sugar').checked = true;
+        document.getElementById('input-bp').value = '';
+        document.getElementById('input-stress').value = 'moderate';
+        document.getElementById('input-bmi').value = '27';
+        document.getElementById('input-sleep').value = '6';
+        showToast('Applied Persona: Mid-Level Manager (Moderate Risk)');
+        runAnalysis();
+      } else if (type === 'high') {
+        document.getElementById('input-age').value = 55;
+        document.getElementById('age-display').innerText = '55 years';
+        document.getElementById('smoker-yes').checked = true;
+        document.getElementById('ex-never').checked = true;
+        document.getElementById('diet-junk').checked = true;
+        document.getElementById('input-bp').value = 'high';
+        document.getElementById('input-stress').value = 'high';
+        document.getElementById('input-bmi').value = '32';
+        document.getElementById('input-sleep').value = '5';
+        showToast('Applied Persona: Senior Executive (High Risk)');
+        runAnalysis();
+      } else if (type === 'incomplete') {
+        // Trigger guardrail
+        switchTab('text');
+        document.getElementById('raw-text-input').value = '{\n  "age": 42\n}';
+        showToast('Loaded Incomplete Profile (Triggers Guardrail)');
+        submitRawText();
+      }
+    }
+
+    // Interactive Form Submit
+    async function runAnalysis() {
+      const age = parseInt(document.getElementById('input-age').value, 10);
+      const smoker = document.querySelector('input[name="smoker"]:checked').value === 'true';
+      const exercise = document.querySelector('input[name="exercise"]:checked').value;
+      const diet = document.querySelector('input[name="diet"]:checked').value;
+      const bp = document.getElementById('input-bp').value;
+      const stress = document.getElementById('input-stress').value;
+      const bmiVal = document.getElementById('input-bmi').value;
+      const sleepVal = document.getElementById('input-sleep').value;
+
+      const payload = {
+        age: age,
+        smoker: smoker,
+        exercise: exercise,
+        diet: diet
+      };
+
+      if (bp) payload.blood_pressure = bp;
+      if (stress) payload.stress = stress;
+      if (bmiVal) payload.bmi = parseFloat(bmiVal);
+      if (sleepVal) payload.sleep_hours = parseFloat(sleepVal);
+
+      setLoading(true);
+      try {
+        const startTime = performance.now();
+        const res = await fetch(`${API_BASE}/api/v1/analyze/text`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ json_data: payload })
+        });
+        const elapsed = Math.round(performance.now() - startTime);
+
+        if (!res.ok) {
+          const errData = await res.json();
+          handleGuardrailError(errData);
+          setLoading(false);
+          return;
+        }
+
+        const data = await res.json();
+        lastResponseData = data;
+        renderResults(data, elapsed);
+        showToast('Risk analysis completed successfully');
+      } catch (err) {
+        showToast('Failed to connect to API: ' + err.message, true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Submit Raw Text / JSON
+    async function submitRawText() {
+      const raw = document.getElementById('raw-text-input').value.trim();
+      let bodyPayload = {};
+
+      try {
+        const parsed = JSON.parse(raw);
+        bodyPayload = { json_data: parsed };
+      } catch (e) {
+        // Not JSON, send as raw text
+        bodyPayload = { text: raw };
+      }
+
+      setLoading(true, 'text');
+      try {
+        const startTime = performance.now();
+        const res = await fetch(`${API_BASE}/api/v1/analyze/text`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bodyPayload)
+        });
+        const elapsed = Math.round(performance.now() - startTime);
+
+        if (!res.ok) {
+          const errData = await res.json();
+          handleGuardrailError(errData);
+          setLoading(false, 'text');
+          return;
+        }
+
+        const data = await res.json();
+        lastResponseData = data;
+        renderResults(data, elapsed);
+        showToast('Survey analyzed successfully');
+      } catch (err) {
+        showToast('Error: ' + err.message, true);
+      } finally {
+        setLoading(false, 'text');
+      }
+    }
+
+    // OCR File Handling
+    function handleFileSelect(e) {
+      if (e.target.files && e.target.files[0]) {
+        selectedFile = e.target.files[0];
+        document.getElementById('file-preview').style.display = 'flex';
+        document.getElementById('file-name-display').innerText = selectedFile.name + ` (${Math.round(selectedFile.size / 1024)} KB)`;
+      }
+    }
+
+    async function loadSampleImage() {
+      try {
+        const res = await fetch('/sample_inputs/survey_form.png');
+        if (res.ok) {
+          const blob = await res.blob();
+          selectedFile = new File([blob], 'survey_form.png', { type: 'image/png' });
+          document.getElementById('file-preview').style.display = 'flex';
+          document.getElementById('file-name-display').innerText = 'survey_form.png (Sample Scanned Survey)';
+          showToast('Sample image loaded into memory');
+        } else {
+          showToast('Sample image available via direct backend path');
+        }
+      } catch (e) {
+        showToast('Sample file ready. Click Run Extraction.');
+      }
+    }
+
+    async function submitOcrImage() {
+      if (!selectedFile) {
+        showToast('Please select or load an image first', true);
+        return;
+      }
+
+      setLoading(true, 'ocr');
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        const startTime = performance.now();
+        const res = await fetch(`${API_BASE}/api/v1/analyze/image`, {
+          method: 'POST',
+          body: formData
+        });
+        const elapsed = Math.round(performance.now() - startTime);
+
+        if (!res.ok) {
+          const errData = await res.json();
+          handleGuardrailError(errData);
+          setLoading(false, 'ocr');
+          return;
+        }
+
+        const data = await res.json();
+        lastResponseData = data;
+        renderResults(data, elapsed);
+        showToast('OCR extraction and risk scoring successful');
+      } catch (err) {
+        showToast('OCR Error: ' + err.message, true);
+      } finally {
+        setLoading(false, 'ocr');
+      }
+    }
+
+    // Render Results
+    function renderResults(data, elapsedMs) {
+      document.getElementById('empty-state').style.display = 'none';
+      const container = document.getElementById('result-container');
+      container.style.display = 'block';
+
+      const risk = data.risk;
+      const level = risk.risk_level.toLowerCase();
+      const score = risk.score;
+      const factors = data.factors.factors || [];
+      const recs = data.recommendations.recommendations || [];
+      const confidence = Math.round((data.parsed.confidence || 0.85) * 100);
+
+      // Process Time
+      document.getElementById('process-time-label').innerText = `⚡ ${elapsedMs}ms latency`;
+
+      // Verdict Banner
+      const banner = document.getElementById('verdict-banner');
+      banner.className = `verdict-banner ${level}`;
+
+      document.getElementById('risk-score').innerText = score;
+
+      const headlineEl = document.getElementById('verdict-headline');
+      const descEl = document.getElementById('verdict-description');
+      const metricLevelEl = document.getElementById('metric-risk-level');
+      const benefitContentEl = document.getElementById('plum-benefit-content');
+
+      if (level === 'low') {
+        headlineEl.innerText = 'Low Health Risk — Preferred Tier';
+        descEl.innerText = 'Standard terms approved. Excellent lifestyle profile with zero adverse underwriting indicators.';
+        metricLevelEl.innerText = 'LOW RISK';
+        metricLevelEl.style.color = 'var(--emerald-400)';
+        benefitContentEl.innerHTML = '<strong>Plum Preferred Underwriting:</strong> Eligible for <strong>15% Healthy Habits Premium Discount</strong>. Full coverage approved with complimentary annual wellness screening and teleconsultations.';
+      } else if (level === 'moderate') {
+        headlineEl.innerText = 'Moderate Health Risk — Standard Tier';
+        descEl.innerText = 'Standard terms approved. Mild lifestyle risk factors identified. Recommended for digital health tracking.';
+        metricLevelEl.innerText = 'MODERATE RISK';
+        metricLevelEl.style.color = 'var(--amber-400)';
+        benefitContentEl.innerHTML = '<strong>Plum Standard Underwriting:</strong> Standard coverage issued. Enrolled in <strong>Plum Preventive Habit Tracker & Nutrition Teleconsult</strong> to qualify for year-end wellness cashbacks.';
+      } else {
+        headlineEl.innerText = 'High Health Risk — Underwriting Review';
+        descEl.innerText = 'Elevated actuarial risk profile. Multiple lifestyle or clinical co-factors present requiring medical management.';
+        metricLevelEl.innerText = 'HIGH RISK';
+        metricLevelEl.style.color = 'var(--rose-400)';
+        benefitContentEl.innerHTML = '<strong>Plum Care Underwriting:</strong> Policy approved with <strong>Dedicated Care Manager Assignment</strong>. Applicant offered sponsored smoking cessation and chronic risk tele-counselling.';
+      }
+
+      // Metrics
+      document.getElementById('metric-confidence').innerText = `${confidence}%`;
+      document.getElementById('metric-factor-count').innerText = `${factors.length} Active`;
+
+      // Factors
+      const factorsWrap = document.getElementById('factors-wrap');
+      factorsWrap.innerHTML = '';
+      if (factors.length === 0) {
+        factorsWrap.innerHTML = '<span class="factor-tag clean">✓ No Significant Risk Factors Detected</span>';
+      } else {
+        factors.forEach(f => {
+          factorsWrap.innerHTML += `<span class="factor-tag">⚠️ ${escapeHtml(f)}</span>`;
+        });
+      }
+
+      // Rationale
+      const rationaleList = document.getElementById('rationale-list');
+      rationaleList.innerHTML = '';
+      if (risk.rationale && risk.rationale.length > 0) {
+        risk.rationale.forEach(r => {
+          rationaleList.innerHTML += `<li class="rationale-item"><span class="rationale-bullet">•</span> <span>${escapeHtml(r)}</span></li>`;
+        });
+      } else {
+        rationaleList.innerHTML = `<li class="rationale-item"><span class="rationale-bullet">•</span> <span>No adverse lifestyle or clinical markers detected.</span></li>`;
+      }
+
+      // Recommendations
+      const recsBox = document.getElementById('recs-box');
+      recsBox.innerHTML = '';
+      recs.forEach(rec => {
+        recsBox.innerHTML += `
+          <div class="rec-item">
+            <div class="rec-icon-check">✓</div>
+            <div class="rec-text">${escapeHtml(rec)}</div>
+          </div>
+        `;
+      });
+
+      // Raw JSON Pre
+      document.getElementById('raw-json-code').innerText = JSON.stringify(data, null, 2);
+    }
+
+    // Guardrail Error Handling
+    function handleGuardrailError(errData) {
+      document.getElementById('empty-state').style.display = 'none';
+      const container = document.getElementById('result-container');
+      container.style.display = 'block';
+
+      const banner = document.getElementById('verdict-banner');
+      banner.className = 'verdict-banner high';
+      document.getElementById('risk-score').innerText = '--';
+      document.getElementById('verdict-headline').innerText = 'Incomplete Profile — Guardrail Triggered';
+      document.getElementById('verdict-description').innerText = errData.reason || 'More than 50% of required fields are missing. Underwriting risk profiling cannot be safely calculated.';
+
+      document.getElementById('metric-risk-level').innerText = 'INCOMPLETE';
+      document.getElementById('metric-risk-level').style.color = 'var(--rose-400)';
+      document.getElementById('metric-confidence').innerText = '0%';
+      document.getElementById('metric-factor-count').innerText = 'N/A';
+
+      document.getElementById('plum-benefit-content').innerHTML = '<strong>Policy Intake On Hold:</strong> The applicant must provide at least 2 required health declarations (Age, Smoker status, Exercise frequency, or Diet) before underwriting evaluation.';
+
+      document.getElementById('factors-wrap').innerHTML = '<span class="factor-tag">Data Guardrail Enforced</span>';
+      document.getElementById('rationale-list').innerHTML = `<li class="rationale-item"><span class="rationale-bullet">•</span> <span>${escapeHtml(errData.reason || 'Missing required declaration fields.')}</span></li>`;
+      document.getElementById('recs-box').innerHTML = `
+        <div class="rec-item">
+          <div class="rec-icon-check">!</div>
+          <div class="rec-text">Please complete the required survey fields to receive an accurate health risk assessment.</div>
+        </div>
+      `;
+
+      document.getElementById('raw-json-code').innerText = JSON.stringify(errData, null, 2);
+      showToast('Guardrail Triggered: ' + (errData.reason || 'Incomplete profile'), true);
+    }
+
+    // Reset Form
+    function resetForm() {
+      document.getElementById('input-age').value = 35;
+      document.getElementById('age-display').innerText = '35 years';
+      document.getElementById('smoker-no').checked = true;
+      document.getElementById('ex-daily').checked = true;
+      document.getElementById('diet-balanced').checked = true;
+      document.getElementById('input-bp').value = '';
+      document.getElementById('input-stress').value = 'low';
+      document.getElementById('input-bmi').value = '';
+      document.getElementById('input-sleep').value = '';
+      document.getElementById('empty-state').style.display = 'block';
+      document.getElementById('result-container').style.display = 'none';
+      showToast('Form reset to default values');
+    }
+
+    // Toggle Raw JSON Drawer
+    function toggleJsonDrawer() {
+      const drawer = document.getElementById('raw-json-drawer');
+      drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Copy Summary Text
+    function copySummaryText() {
+      if (!lastResponseData) return;
+      const text = `PLUM HEALTH INSURANCE UNDERWRITING SUMMARY
+Risk Tier: ${lastResponseData.risk.risk_level.toUpperCase()} (Score: ${lastResponseData.risk.score}/100)
+Identified Factors: ${lastResponseData.factors.factors.join(', ') || 'None'}
+Rationale: ${lastResponseData.risk.rationale.join('; ')}
+Parser Confidence: ${Math.round(lastResponseData.parsed.confidence * 100)}%`;
+      navigator.clipboard.writeText(text);
+      showToast('Underwriting summary copied to clipboard');
+    }
+
+    // Loading State
+    function setLoading(isLoading, source = 'form') {
+      const btnSpinner = document.getElementById('btn-spinner');
+      const btnText = document.getElementById('btn-text');
+      const submitBtn = document.getElementById('btn-submit');
+
+      if (source === 'form') {
+        btnSpinner.style.display = isLoading ? 'inline-block' : 'none';
+        btnText.innerText = isLoading ? 'Profiling Risk …' : 'Generate Plum Risk Profile';
+        submitBtn.disabled = isLoading;
+      }
+    }
+
+    // Toast helper
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.className = `toast show ${isError ? 'error' : ''}`;
+      setTimeout(() => {
+        toast.className = 'toast';
+      }, 3500);
+    }
+
+    // HTML escape
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
