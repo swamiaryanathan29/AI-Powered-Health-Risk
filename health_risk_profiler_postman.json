@@ -1,0 +1,253 @@
+{
+  "info": {
+    "name": "AI-Powered Health Risk Profiler",
+    "description": "Complete Postman collection for the AI-Powered Health Risk Profiler API.\n\nSet the `base_url` variable to:\n- Local: http://localhost:8000\n- ngrok: https://<id>.ngrok-free.app",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Root – Service Info",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/",
+            "description": "Returns service name, version, status and docs URL."
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health",
+            "description": "Simple liveness check."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Step 1 – Parse",
+      "item": [
+        {
+          "name": "Parse JSON Survey",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/parse/text",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json_data\": {\n    \"age\": 42,\n    \"smoker\": true,\n    \"exercise\": \"rarely\",\n    \"diet\": \"high sugar\"\n  }\n}"
+            },
+            "description": "Parse a structured JSON survey. Returns parsed answers, missing fields and confidence score."
+          }
+        },
+        {
+          "name": "Parse Raw Text Survey",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/parse/text",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Age: 42\\nSmoker: yes\\nExercise: rarely\\nDiet: high sugar\"\n}"
+            },
+            "description": "Parse a raw key-value text survey (e.g. from a form scan)."
+          }
+        },
+        {
+          "name": "Parse – Guardrail (Incomplete Survey)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/parse/text",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json_data\": {\n    \"age\": 42\n  }\n}"
+            },
+            "description": "Demonstrates the guardrail: >50% required fields missing → HTTP 422."
+          }
+        },
+        {
+          "name": "Parse Image (OCR)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/parse/image",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "sample_inputs/survey_form.png",
+                  "description": "Run `python3 sample_inputs/generate_test_image.py` first to create this file."
+                }
+              ]
+            },
+            "description": "Upload a scanned survey image; OCR extracts text then key-value parser runs. Requires Tesseract or falls back to mock."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Step 2 – Factor Extraction",
+      "item": [
+        {
+          "name": "Extract Factors – High Risk Profile",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/factors",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": {\n    \"age\": 42,\n    \"smoker\": true,\n    \"exercise\": \"rarely\",\n    \"diet\": \"high sugar\"\n  }\n}"
+            },
+            "description": "Rule-based extraction of named risk factors from parsed answers."
+          }
+        },
+        {
+          "name": "Extract Factors – Low Risk Profile",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/factors",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": {\n    \"age\": 30,\n    \"smoker\": false,\n    \"exercise\": \"daily\",\n    \"diet\": \"balanced\"\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Step 3 – Risk Classification",
+      "item": [
+        {
+          "name": "Classify Risk – High",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/risk",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"factors\": [\"smoking\", \"poor diet\", \"low exercise\"],\n  \"answers\": {\n    \"age\": 42,\n    \"smoker\": true,\n    \"exercise\": \"rarely\",\n    \"diet\": \"high sugar\"\n  }\n}"
+            },
+            "description": "Weighted scoring → risk level (low/moderate/high) + score 0-100 + rationale."
+          }
+        },
+        {
+          "name": "Classify Risk – Low",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/risk",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"factors\": [],\n  \"answers\": {\n    \"age\": 28,\n    \"smoker\": false,\n    \"exercise\": \"daily\",\n    \"diet\": \"balanced\"\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Step 4 – Recommendations",
+      "item": [
+        {
+          "name": "Get Recommendations – High Risk",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/recommendations",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"risk_level\": \"high\",\n  \"factors\": [\"smoking\", \"poor diet\", \"low exercise\"],\n  \"answers\": {}\n}"
+            },
+            "description": "Maps each risk factor to actionable, non-diagnostic lifestyle guidance."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Full Pipeline (One-Shot)",
+      "item": [
+        {
+          "name": "Analyze Text – Standard Profile",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/analyze/text",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json_data\": {\n    \"age\": 42,\n    \"smoker\": true,\n    \"exercise\": \"rarely\",\n    \"diet\": \"high sugar\"\n  }\n}"
+            },
+            "description": "Runs all 4 pipeline steps (parse → factors → risk → recommendations) in a single call."
+          }
+        },
+        {
+          "name": "Analyze Text – Extended High-Risk Profile",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/analyze/text",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json_data\": {\n    \"age\": 55,\n    \"smoker\": true,\n    \"exercise\": \"never\",\n    \"diet\": \"junk food\",\n    \"alcohol\": true,\n    \"bmi\": 32,\n    \"stress\": \"high\",\n    \"sleep_hours\": 5,\n    \"blood_pressure\": \"high\",\n    \"family_history\": true\n  }\n}"
+            },
+            "description": "Full high-risk profile with all 10 risk factors triggered. Score: 100."
+          }
+        },
+        {
+          "name": "Analyze Text – Raw Text Input",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/analyze/text",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Age: 50\\nSmoker: yes\\nExercise: never\\nDiet: high sodium\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Analyze Image – Full Pipeline",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/analyze/image",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "sample_inputs/survey_form.png",
+                  "description": "Run `python3 sample_inputs/generate_test_image.py` first."
+                }
+              ]
+            },
+            "description": "Full pipeline with image upload. OCR → parse → factors → risk → recommendations."
+          }
+        },
+        {
+          "name": "Analyze Text – Guardrail (Incomplete)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/analyze/text",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"json_data\": {\n    \"age\": 35\n  }\n}"
+            },
+            "description": "Should return 422 incomplete_profile when too many required fields are missing."
+          }
+        }
+      ]
+    }
+  ]
+}
